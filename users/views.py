@@ -104,8 +104,8 @@ class RegisterRequestView(APIView):
             userCreateRequest.sms_code = sms_code
             userCreateRequest.save()
             print(sms_code)
-            requests.post("https://api.mobizon.kz/service/message/sendsmsmessage?recipient=" + userCreateRequest.phone_number + "&text=Код для входа на сайт www.dormbooking.kz : " + sms_code + "&apiKey=kz0502f56621750a9ca3ac636e8301e235c2b647839531f2994222514c786fb6ff2178")
-
+            response = requests.post("https://api.mobizon.kz/service/message/sendsmsmessage?recipient=" + userCreateRequest.phone_number + "&text=Код для входа на сайт www.dormbooking.kz : " + sms_code + "&apiKey=kz0502f56621750a9ca3ac636e8301e235c2b647839531f2994222514c786fb6ff2178")
+            print(response.json())
             return Response({'message': 'SMS code sent. Please verify to complete registration.', 'sms_code': sms_code},
                             status=200)
 

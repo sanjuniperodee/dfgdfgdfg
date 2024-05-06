@@ -3,6 +3,7 @@ import random
 from datetime import datetime, timedelta
 
 import jwt
+import requests
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -103,6 +104,8 @@ class RegisterRequestView(APIView):
             userCreateRequest.sms_code = sms_code
             userCreateRequest.save()
             print(sms_code)
+            requests.post("https://api.mobizon.kz/service/message/sendsmsmessage?recipient=" + userCreateRequest.phone_number + "&text=Код для входа на сайт www.dormbooking.kz : " + sms_code + "&apiKey=kz0502f56621750a9ca3ac636e8301e235c2b647839531f2994222514c786fb6ff2178")
+
             return Response({'message': 'SMS code sent. Please verify to complete registration.', 'sms_code': sms_code},
                             status=200)
 

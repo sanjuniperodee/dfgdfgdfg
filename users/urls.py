@@ -11,4 +11,6 @@ urlpatterns = [
     path('upload_document', UploadDocumentView.as_view(), name='upload-document'),
     path('application', ApplicationView.as_view(), name='get-application'),
     path('approve', ApproveApplicationView.as_view(), name='approve-application'),
+    path('universities', UniversitiesView.as_view(), name='get-universities'),
+    path('university/<slug>', UniversityBySlugView.as_view(), name='university-by-slug')
 ]

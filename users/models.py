@@ -4,6 +4,20 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 
+class University(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    available_places = models.IntegerField()
+    image = models.ImageField(upload_to='', blank=True, null=True, default=None)
+    address = models.CharField(max_length=255, blank=True)
+    distance = models.CharField(max_length=255, blank=True)
+    slug = models.CharField(max_length=255, blank=True)
+    price = models.CharField(max_length=255, blank=True)
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
+    def __str__(self):
+        return self.name
+
 
 class User(AbstractUser):
     first_name = models.CharField(max_length=255, verbose_name='Имя')
@@ -14,6 +28,10 @@ class User(AbstractUser):
     password = models.CharField(max_length=255, null=True, verbose_name='Пароль')
     user_documents = models.ManyToManyField('Document', blank=True, default=[], verbose_name='Документы')
     apply_approved = models.BooleanField(default=False, verbose_name='')
+    university = models.ForeignKey(University, on_delete=models.CASCADE, verbose_name='Универ', default=None, null=True)
+    created_date = models.DateField(blank=True, null=True)
+    place = models.CharField(max_length=255, verbose_name='Место в общаге', null=True, blank=True)
+
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
@@ -57,7 +75,7 @@ class Document(models.Model):
         ('rejected', 'Rejected'),
         ('pending', 'Pending'),
     ]
-
+    decline_reason = models.CharField(max_length=255, default='', null=True, blank=True)
     title = models.ForeignKey(Type, on_delete=models.CASCADE)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     file = models.FileField(blank=True, null=True)

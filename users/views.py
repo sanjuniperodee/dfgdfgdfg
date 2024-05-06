@@ -1,13 +1,15 @@
+import json
 import random
 from datetime import datetime, timedelta
 
 import jwt
+from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import AuthenticationFailed
 
 from users.forms import CreateUserRequestForm
-from users.models import User, Document, UserCreateRequest, Type
+from users.models import User, Document, UserCreateRequest, Type, University
 from users.serializers import UserSerializer, DocumentSerializer
 
 
@@ -57,13 +59,24 @@ class ApplicationView(APIView):
         payload = jwt.decode(token, 'sercet', algorithms=['HS256'])
         user = User.objects.filter(id=payload['id']).first()
         chance = 0
+        stats = True
         for document in user.user_documents.all():
             print(document.title.score)
             if document.status == 'approved':
                 chance += document.title.score
+            else:
+                stats = False
         if not user.apply_approved:
-            chance = -1
-        return Response({'chance': chance}, status=200)
+            return Response({'chance': -1}, status=200)
+        return Response({
+            'status': stats,
+            'chance': chance,
+            'start': user.created_date,
+            'university': user.university.name,
+            'days_left': user.university.end_date - datetime.now().date(),
+            'user': user.first_name + ' ' + user.last_name,
+        },
+        status=200)
 
 
 class ApproveApplicationView(APIView):
@@ -72,6 +85,8 @@ class ApproveApplicationView(APIView):
         payload = jwt.decode(token, 'sercet', algorithms=['HS256'])
         user = User.objects.filter(id=payload['id']).first()
         user.apply_approved = True
+        user.created_date = datetime.now()
+        user.university = University.objects.filter(slug=request.data.get('university')).first()
         user.save()
         return Response({}, status=200)
 
@@ -175,6 +190,7 @@ class UserDocuments(APIView):
         for i in user.user_documents.all():
             item = {
                 'id': i.pk,
+                'decline': i.decline_reason,
                 'title': i.title.title,
                 'score': i.title.score,
                 'status': i.status,
@@ -183,3 +199,42 @@ class UserDocuments(APIView):
             data.append(item)
         print(data)
         return Response(data)
+
+
+class UniversitiesView(APIView):
+    def get(self, request):
+        queryset = University.objects.all()
+        data = []
+        for i in queryset:
+            item = {
+                'id': i.pk,
+                'name': i.name,
+                'slug': i.slug,
+                'distance': i.distance,
+                'description': i.description,
+                'address': i.address,
+                'places': i.available_places - len(User.objects.filter(university=i, apply_approved=True)),
+                'price': i.price,
+                'image': i.image.url
+            }
+            data.append(item)
+        print(data)
+        return Response(data)
+
+
+class UniversityBySlugView(APIView):
+    def get(self, request, slug):
+        university = University.objects.filter(slug=slug).first()
+        return Response({
+            'id': university.pk,
+            'name': university.name,
+            'slug': university.slug,
+            'distance': university.distance,
+            'description': university.description,
+            'address': university.address,
+            'places': university.available_places - len(User.objects.filter(university=university, apply_approved=True)),
+            'price': university.price,
+            'start': university.start_date,
+            'end': university.end_date,
+            'image': university.image.url
+        })

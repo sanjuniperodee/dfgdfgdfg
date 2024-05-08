@@ -12,5 +12,7 @@ urlpatterns = [
     path('application', ApplicationView.as_view(), name='get-application'),
     path('approve', ApproveApplicationView.as_view(), name='approve-application'),
     path('universities', UniversitiesView.as_view(), name='get-universities'),
-    path('university/<slug>', UniversityBySlugView.as_view(), name='university-by-slug')
+    path('university/<slug>', UniversityBySlugView.as_view(), name='university-by-slug'),
+    path('user/update/<str:field>/', update_user, name='update_user'),
+
 ]

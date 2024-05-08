@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 import jwt
 import requests
+from django.http import JsonResponse
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -90,6 +91,28 @@ class ApproveApplicationView(APIView):
         user.university = University.objects.filter(slug=request.data.get('university')).first()
         user.save()
         return Response({}, status=200)
+
+
+def update_user(request, field):
+    data = json.loads(request.body)
+    token = data.get('jwt')
+    payload = jwt.decode(token, 'sercet', algorithms=['HS256'])
+    user = User.objects.filter(id=payload['id']).first()
+
+    if field == 'first_name':
+        name = data.get('first_name').split(' ')
+        user.first_name = name[0]
+        if len(name) > 1:
+            user.last_name = name[1]
+        user.save()
+        return JsonResponse({'status': 'success', 'message': f'{field} updated successfully.'}, status=200)
+    elif field == 'email':
+        email = data.get('email')
+        user.email = email
+        user.save()
+        return JsonResponse({'status': 'success', 'message': f'{field} updated successfully.'}, status=200)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid field.'}, status=400)
 
 
 class RegisterRequestView(APIView):

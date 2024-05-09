@@ -18,12 +18,21 @@ class University(models.Model):
     def __str__(self):
         return self.name
 
+class UniversityImage(models.Model):
+    post = models.ForeignKey(University, default=None, on_delete=models.CASCADE)
+    images = models.ImageField()
+
+    def __str__(self):
+        return self.post.name
+
 
 class User(AbstractUser):
     first_name = models.CharField(max_length=255, verbose_name='Имя')
     last_name = models.CharField(max_length=255, verbose_name='Фамилия')
     email = models.CharField(max_length=255, unique=True, verbose_name='Электронная почта')
     phone_number = models.CharField(max_length=255, unique=True, verbose_name='Номер телефона')
+    iin = models.CharField(max_length=255, null=True, blank=True)
+    birth_date = models.DateField(null=True, blank=True)
     username = models.CharField(max_length=255, unique=True, null=True)
     password = models.CharField(max_length=255, null=True, verbose_name='Пароль')
     user_documents = models.ManyToManyField('Document', blank=True, default=[], verbose_name='Документы')
@@ -50,6 +59,8 @@ class UserCreateRequest(models.Model):
     username = models.CharField(max_length=255, unique=True, null=True)
     password = models.CharField(max_length=255, null=True, verbose_name='Пароль')
     sms_code = models.CharField(max_length=6, blank=True, null=True)
+    iin = models.CharField(max_length=255, null=True, blank=True)
+    birth_date = models.DateField(null=True, blank=True)
 
     class Meta:
         verbose_name = 'Запрос на регистрацию'

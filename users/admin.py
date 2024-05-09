@@ -6,4 +6,12 @@ admin.site.register(User)
 admin.site.register(UserCreateRequest)
 admin.site.register(Type)
 admin.site.register(Document)
-admin.site.register(University)
+class PostImageAdmin(admin.StackedInline):
+    model = UniversityImage
+@admin.register(University)
+class PostAdmin(admin.ModelAdmin):
+    inlines = [PostImageAdmin]
+
+    class Meta:
+        model = University
+

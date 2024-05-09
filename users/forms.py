@@ -15,14 +15,20 @@ class CreateUserRequestForm(forms.Form):
     phone_number = forms.CharField(max_length=15, required=True,
                                    widget=forms.TextInput(attrs={'placeholder': 'Phone Number'}))
     password = forms.CharField(required=True, widget=forms.PasswordInput())
+    iin = forms.CharField(required=True, widget=forms.TextInput())
+    birth_date = forms.CharField(required=True, widget=forms.DateInput())
+
     def save(self, commit=True):
         data = self.cleaned_data
+        print(data)
         user = UserCreateRequest(
             first_name=data['first_name'],
             last_name=data['last_name'],
             email=data['email'],
             phone_number=data['phone_number'],
             password=data['password'],
+            iin=data['iin'],
+            birth_date=data['birth_date']
         )
         if commit:
             with transaction.atomic():

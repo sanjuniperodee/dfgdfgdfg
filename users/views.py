@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import AuthenticationFailed
 
 from users.forms import CreateUserRequestForm
-from users.models import User, Document, UserCreateRequest, Type, University
+from users.models import User, Document, UserCreateRequest, Type, University, UniversityImage
 from users.serializers import UserSerializer, DocumentSerializer
 
 
@@ -106,6 +106,17 @@ def update_user(request, field):
             user.last_name = name[1]
         user.save()
         return JsonResponse({'status': 'success', 'message': f'{field} updated successfully.'}, status=200)
+    elif field == 'birth_date':
+        birth_date = data.get('birth_date')
+        user.birth_date = birth_date
+        user.save()
+        return JsonResponse({'status': 'success', 'message': f'{field} updated successfully.'}, status=200)
+    elif field == 'iin':
+        iin = data.get('iin')
+        user.iin = iin
+        user.save()
+        return JsonResponse({'status': 'success', 'message': f'{field} updated successfully.'}, status=200)
+
     elif field == 'email':
         email = data.get('email')
         user.email = email
@@ -119,10 +130,11 @@ class RegisterRequestView(APIView):
     def post(self, request):
         form = CreateUserRequestForm(data=request.data)
         if form.is_valid():
-            try:
-                userCreateRequest = form.save()
-            except:
-                return Response({'message': 'Пользователь с такой почтой или номером уже существует!'})
+            # try:
+            userCreateRequest = form.save()
+            # except:
+            #     print(e)
+            #     return Response({'message': 'Пользователь с такой почтой или номером уже существует!'})
             sms_code = str(random.randint(100000, 999999))
             userCreateRequest.sms_code = sms_code
             userCreateRequest.save()
@@ -150,6 +162,8 @@ class RegisterView(APIView):
             phone_number=userCreateRequest.phone_number,
             username=userCreateRequest.username,
             password=userCreateRequest.password,
+            iin=userCreateRequest.iin,
+            birth_date=userCreateRequest.birth_date
         )
         user.save()
 
@@ -251,7 +265,9 @@ class UniversitiesView(APIView):
 class UniversityBySlugView(APIView):
     def get(self, request, slug):
         university = University.objects.filter(slug=slug).first()
+        images = [image.images.url for image in UniversityImage.objects.filter(post=university)]
         return Response({
+            'images': images,
             'id': university.pk,
             'name': university.name,
             'slug': university.slug,

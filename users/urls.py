@@ -10,9 +10,11 @@ urlpatterns = [
     path('documents', UserDocuments.as_view(), name='get-user-documents'),
     path('upload_document', UploadDocumentView.as_view(), name='upload-document'),
     path('application', ApplicationView.as_view(), name='get-application'),
+    path('applications', ApplicationAdminView.as_view(), name='get-all-applications'),
     path('approve', ApproveApplicationView.as_view(), name='approve-application'),
     path('universities', UniversitiesView.as_view(), name='get-universities'),
     path('university/<slug>', UniversityBySlugView.as_view(), name='university-by-slug'),
     path('user/update/<str:field>/', update_user, name='update_user'),
+    path('document/update/<str:id>', EditDocumentStatusView.as_view(), name='edit-document-status')
 
 ]

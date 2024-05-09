@@ -61,16 +61,19 @@ class ApplicationView(APIView):
         payload = jwt.decode(token, 'sercet', algorithms=['HS256'])
         user = User.objects.filter(id=payload['id']).first()
         chance = 0
+        stats = True
         for document in user.user_documents.all():
             print(document.title.score)
             if document.status == 'approved':
                 chance += document.title.score
+            else:
+                stats = False
 
         if not user.apply_approved:
             return Response({'chance': -1}, status=200)
         print(user.university)
         return Response({
-            'status': chance > 50,
+            'status': stats and len(user.user_documents.all()) > 0,
             'chance': chance,
             'start': user.created_date,
             'university': user.university.name,
@@ -78,6 +81,54 @@ class ApplicationView(APIView):
             'user': user.first_name + ' ' + user.last_name,
         },
         status=200)
+
+
+class ApplicationAdminView(APIView):
+    def post(self, request):
+        users = User.objects.filter(apply_approved=True)
+        applications = []
+        for user in users:
+            chance = 0
+            stats = True
+            for document in user.user_documents.all():
+                print(document.title.score)
+                if document.status == 'approved':
+                    chance += document.title.score
+                else:
+                    stats = False
+            if not user.apply_approved:
+                return Response({'chance': -1}, status=200)
+            print(user.university)
+            applications.append({
+                'user': user.toJson(),
+                'status': stats and len(user.user_documents.all()) > 0,
+                'chance': chance,
+                'start': user.created_date,
+                'university': user.university.name,
+                'days_left': user.university.end_date - datetime.now().date(),
+                # 'user': user.first_name + ' ' + user.last_name,
+            },)
+        print(applications)
+        return Response(applications, status=200)
+
+
+class EditDocumentStatusView(APIView):
+    def post(self, request, id):
+        document = Document.objects.get(pk=id)
+        print(document)
+        status = request.data.get('status')
+        reject_reason = request.data.get('reject_reason')
+        if status == 'Approved':
+            document.status = 'approved'
+        if status == 'Rejected':
+            document.status = 'rejected'
+            document.decline_reason = reject_reason
+        if status == 'Pending':
+            document.status = 'pending'
+
+        document.save()
+        print(request.data)
+        return Response({}, status=200)
 
 
 class ApproveApplicationView(APIView):

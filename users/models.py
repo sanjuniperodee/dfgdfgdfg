@@ -45,6 +45,17 @@ class User(AbstractUser):
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 
+    def toJson(self):
+        return {
+            'id': self.id,
+            'name': self.first_name,
+            'surname': self.last_name,
+            'iin': self.iin,
+            'phone': self.phone_number,
+            'birth_date': self.birth_date,
+            'email': self.email
+        };
+
     # USERNAME_FIELD = phone_number
 
     def __str__(self):

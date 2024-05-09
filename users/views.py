@@ -61,18 +61,16 @@ class ApplicationView(APIView):
         payload = jwt.decode(token, 'sercet', algorithms=['HS256'])
         user = User.objects.filter(id=payload['id']).first()
         chance = 0
-        stats = True
         for document in user.user_documents.all():
             print(document.title.score)
             if document.status == 'approved':
                 chance += document.title.score
-            else:
-                stats = False
+
         if not user.apply_approved:
             return Response({'chance': -1}, status=200)
         print(user.university)
         return Response({
-            'status': stats,
+            'status': chance > 50,
             'chance': chance,
             'start': user.created_date,
             'university': user.university.name,

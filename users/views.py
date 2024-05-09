@@ -70,6 +70,7 @@ class ApplicationView(APIView):
                 stats = False
         if not user.apply_approved:
             return Response({'chance': -1}, status=200)
+        print(user.university)
         return Response({
             'status': stats,
             'chance': chance,
@@ -86,6 +87,7 @@ class ApproveApplicationView(APIView):
         token = request.data.get('jwt')
         payload = jwt.decode(token, 'sercet', algorithms=['HS256'])
         user = User.objects.filter(id=payload['id']).first()
+        print(user)
         user.apply_approved = True
         user.created_date = datetime.now()
         user.university = University.objects.filter(slug=request.data.get('university')).first()

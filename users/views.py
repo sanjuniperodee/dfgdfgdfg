@@ -274,7 +274,7 @@ class UserView(APIView):
         if not token:
             raise AuthenticationFailed("Failed to authorize")
         try:
-            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+            payload = jwt.decode(token, 'sercet', algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed("Authorization is expired")
 
@@ -284,7 +284,7 @@ class UserView(APIView):
 
         # Add isAdmin field to the user data
         user_data = UserSerializer(user).data
-        user_data['isAdmin'] = user.is_admin
+        user_data['isAdmin'] = user.is_superuser
 
         return Response(user_data)
 

@@ -271,16 +271,22 @@ class LoginView(APIView):
 class UserView(APIView):
     def post(self, request):
         token = request.data.get('jwt')
-        print(token)
         if not token:
             raise AuthenticationFailed("Failed to authorize")
         try:
-            payload = jwt.decode(token, 'sercet', algorithms=['HS256'])
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed("Authorization is expired")
+
         user = User.objects.filter(id=payload['id']).first()
-        serializer = UserSerializer(user)
-        return Response(serializer.data)
+        if not user:
+            raise AuthenticationFailed("User not found")
+
+        # Add isAdmin field to the user data
+        user_data = UserSerializer(user).data
+        user_data['isAdmin'] = user.is_admin
+
+        return Response(user_data)
 
 
 class UserDocuments(APIView):

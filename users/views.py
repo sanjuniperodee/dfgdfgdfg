@@ -40,7 +40,17 @@ class UploadDocumentView(APIView):
                 print('DOCUMENT HAS BEEN CHANGED')
                 return Response({'message': 'Document updated successfully'}, status=200)
             else:
-                return Response({'error': 'Document not found'}, status=404)
+                token = request.data.get('jwt')
+                payload = jwt.decode(token, 'sercet', algorithms=['HS256'])
+                user = User.objects.filter(id=payload['id']).first()
+                if not user:
+                    return Response({'error': 'User not found'}, status=404)
+                document_type = Type.objects.filter(title=title).first()
+                if not document_type:
+                    return Response({'error': 'Document type not found'}, status=404)
+                document = Document.objects.create(title=document_type, file=file, status='pending')
+                user.user_documents.add(document)
+                return Response({'message': 'Document updated successfully'}, status=200)
         else:
             token = request.data.get('jwt')
             payload = jwt.decode(token, 'sercet', algorithms=['HS256'])
@@ -151,10 +161,13 @@ def update_user(request, field):
     user = User.objects.filter(id=payload['id']).first()
 
     if field == 'first_name':
-        name = data.get('first_name').split(' ')
-        user.first_name = name[0]
-        if len(name) > 1:
-            user.last_name = name[1]
+        name = data.get('first_name')
+        user.first_name = name
+        user.save()
+        return JsonResponse({'status': 'success', 'message': f'{field} updated successfully.'}, status=200)
+    if field == 'last_name':
+        last_name = data.get('last_name')
+        user.last_name = last_name
         user.save()
         return JsonResponse({'status': 'success', 'message': f'{field} updated successfully.'}, status=200)
     elif field == 'birth_date':
@@ -171,6 +184,11 @@ def update_user(request, field):
     elif field == 'email':
         email = data.get('email')
         user.email = email
+        user.save()
+        return JsonResponse({'status': 'success', 'message': f'{field} updated successfully.'}, status=200)
+    elif field == 'password':
+        password = data.get('password')
+        user.password = password
         user.save()
         return JsonResponse({'status': 'success', 'message': f'{field} updated successfully.'}, status=200)
     else:
@@ -293,7 +311,7 @@ class UserDocuments(APIView):
 
 
 class UniversitiesView(APIView):
-    def get(self, request):
+    def get(self, request, search):
         queryset = University.objects.all()
         data = []
         for i in queryset:
@@ -309,6 +327,21 @@ class UniversitiesView(APIView):
                 'image': i.image.url
             }
             data.append(item)
+        if search != 'undefined':
+            queryset = queryset.filter(name__icontains=search)  # Example filter on 'name' field
+
+            # Update data with filtered queryset
+            data = [{
+                'id': obj.pk,
+                'name': obj.name,
+                'slug': obj.slug,
+                'distance': obj.distance,
+                'description': obj.description,
+                'address': obj.address,
+                'places': obj.available_places - len(User.objects.filter(university=obj, apply_approved=True)),
+                'price': obj.price,
+                'image': obj.image.url
+            } for obj in queryset]
         print(data)
         return Response(data)
 

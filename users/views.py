@@ -368,6 +368,24 @@ class UserDocuments(APIView):
         return Response(data)
 
 
+class UserDocumentsById(APIView):
+    def get(self, request, id):
+        user = User.objects.filter(id=id).first()
+        data = []
+        for i in user.user_documents.all():
+            item = {
+                'id': i.pk,
+                'decline': i.decline_reason,
+                'title': i.title.title,
+                'score': i.title.score,
+                'status': i.status,
+                'file' : i.file.name
+            }
+            data.append(item)
+        print(data)
+        return Response(data)
+
+
 class UniversitiesView(APIView):
     def get(self, request, search):
         queryset = University.objects.all()

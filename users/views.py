@@ -93,6 +93,58 @@ class ApplicationView(APIView):
         status=200)
 
 
+class ApplicationByIdView(APIView):
+    def get(self, request, id):
+        user = User.objects.filter(id=id).first()
+        chance = 0
+        stats = True
+        for document in user.user_documents.all():
+            print(document.title.score)
+            if document.status == 'approved':
+                chance += document.title.score
+            else:
+                stats = False
+
+        if not user.apply_approved:
+            return Response({'chance': -1}, status=200)
+        print(user.university)
+        return Response({
+            'status': stats and len(user.user_documents.all()) > 0,
+            'chance': chance,
+            'start': user.created_date,
+            'university': user.university.name,
+            'days_left': user.university.end_date - datetime.now().date(),
+            'user': user.first_name + ' ' + user.last_name,
+        },
+        status=200)
+
+
+class ApplicationByIdView(APIView):
+    def get(self, request, id):
+        user = User.objects.filter(id=id).first()
+        chance = 0
+        stats = True
+        for document in user.user_documents.all():
+            print(document.title.score)
+            if document.status == 'approved':
+                chance += document.title.score
+            else:
+                stats = False
+
+        if not user.apply_approved:
+            return Response({'chance': -1}, status=200)
+        print(user.university)
+        return Response({
+            'status': stats and len(user.user_documents.all()) > 0,
+            'chance': chance,
+            'start': user.created_date,
+            'university': user.university.name,
+            'days_left': user.university.end_date - datetime.now().date(),
+            'user': user.first_name + ' ' + user.last_name,
+        },
+        status=200)
+
+
 class ApplicationAdminView(APIView):
     def post(self, request):
         users = User.objects.filter(apply_approved=True)

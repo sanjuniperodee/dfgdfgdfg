@@ -122,7 +122,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media_root')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LANGUAGE_CODE = 'ru-RU'
-CSRF_TRUSTED_ORIGINS = ['https://dorm-booking.up.railway.app', 'https://dorm-booking.vercel.app', 'http://localhost:3000']
 AUTH_USER_MODEL = 'users.User'
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True

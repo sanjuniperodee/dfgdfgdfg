@@ -4,6 +4,18 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 
+
+class Partner(models.Model):
+    name = models.CharField(max_length=255)
+    university = models.CharField(max_length=255)
+    phone = models.CharField(max_length=20)
+    email = models.EmailField()
+    document_url = models.URLField()
+
+    def __str__(self):
+        return self.name
+
+
 class University(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
@@ -60,6 +72,15 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.first_name + " " + self.last_name + " : " + str(self.pk)
+
+
+class Suggestion(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField()
+    rating = models.IntegerField()
+
+    def __str__(self):
+        return self.text
 
 
 class UserCreateRequest(models.Model):

@@ -2,6 +2,8 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
+    path('partners', PartnerListView.as_view(), name='partner-list'),
+    path('suggestions', SuggestionListView.as_view(), name='suggestion-list'),
     path('user_exists', CheckUserView.as_view(), name='check-user-exists'),
     path('registration-request', RegisterRequestView.as_view(), name='registration-request'),
     path('registration-confirm', RegisterView.as_view(), name='registration-request'),

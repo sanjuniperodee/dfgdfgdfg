@@ -5,14 +5,29 @@ from datetime import datetime, timedelta
 import jwt
 import requests
 from django.http import JsonResponse
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import AuthenticationFailed
 
 from users.forms import CreateUserRequestForm
-from users.models import User, Document, UserCreateRequest, Type, University, UniversityImage
-from users.serializers import UserSerializer, DocumentSerializer
+from users.models import User, Document, UserCreateRequest, Type, University, UniversityImage, Partner, Suggestion
+from users.serializers import UserSerializer, DocumentSerializer, PartnerSerializer, SuggestionSerializer
+
+
+class PartnerListView(APIView):
+    def post(self, request):
+        partners = Partner.objects.all()
+        print(partners)
+        serializer = PartnerSerializer(partners, many=True)
+        return Response(serializer.data)
+
+
+class SuggestionListView(APIView):
+    def post(self, request):
+        suggestions = Suggestion.objects.all()
+        serializer = SuggestionSerializer(suggestions, many=True)
+        return Response(serializer.data)
 
 
 class CheckUserView(APIView):

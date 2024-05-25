@@ -415,6 +415,7 @@ class UniversitiesView(APIView):
                 'address': i.address,
                 'places': i.available_places - len(User.objects.filter(university=i, apply_approved=True)),
                 'price': i.price,
+                'days_left': i.end_date - datetime.now().date(),
                 'image': i.image.url
             }
             data.append(item)
@@ -431,6 +432,7 @@ class UniversitiesView(APIView):
                 'address': obj.address,
                 'places': obj.available_places - len(User.objects.filter(university=obj, apply_approved=True)),
                 'price': obj.price,
+                'days_left': obj.end_date - datetime.now().date(),
                 'image': obj.image.url
             } for obj in queryset]
         print(data)
@@ -453,5 +455,6 @@ class UniversityBySlugView(APIView):
             'price': university.price,
             'start': university.start_date,
             'end': university.end_date,
+            'days_left': university.end_date - datetime.now().date(),
             'image': university.image.url
         })

@@ -23,8 +23,6 @@ class DocumentSerializer(serializers.ModelSerializer):
 
 
 class SuggestionSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()
-
     class Meta:
         model = Suggestion
         fields = '__all__'

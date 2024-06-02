@@ -27,12 +27,13 @@ class SubmitSuggestionView(APIView):
     def post(self, request):
         token = request.data.get('jwt')
         payload = jwt.decode(token, 'sercet', algorithms=['HS256'])
-        serializer = SuggestionSerializer(data=request.data)
-        serializer.user = User.objects.filter(id=payload['id']).first()
+        data = request.data
+        data['user'] = User.objects.filter(id=payload['id']).first()
+        serializer = SuggestionSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=200)
-        return Response(serializer.errors, status=400)
+        return Response(serializer.errors, status=200)
 
 
 class SuggestionListView(APIView):

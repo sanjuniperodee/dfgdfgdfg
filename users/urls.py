@@ -19,6 +19,6 @@ urlpatterns = [
     path('universities/<search>', UniversitiesView.as_view(), name='get-universities'),
     path('university/<slug>', UniversityBySlugView.as_view(), name='university-by-slug'),
     path('user/update/<str:field>/', update_user, name='update_user'),
-    path('document/update/<str:id>', EditDocumentStatusView.as_view(), name='edit-document-status')
-
+    path('document/update/<str:id>', EditDocumentStatusView.as_view(), name='edit-document-status'),
+    path('submit-suggestion', SubmitSuggestionView.as_view(), name='submit-suggestion'),
 ]

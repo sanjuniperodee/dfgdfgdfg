@@ -23,6 +23,18 @@ class PartnerListView(APIView):
         return Response(serializer.data)
 
 
+class SubmitSuggestionView(APIView):
+    def post(self, request):
+        token = request.data.get('jwt')
+        payload = jwt.decode(token, 'sercet', algorithms=['HS256'])
+        serializer = SuggestionSerializer(data=request.data)
+        serializer.user = User.objects.filter(id=payload['id']).first()
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=200)
+        return Response(serializer.errors, status=400)
+
+
 class SuggestionListView(APIView):
     def post(self, request):
         suggestions = Suggestion.objects.all()

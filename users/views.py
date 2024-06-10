@@ -23,6 +23,18 @@ class PartnerListView(APIView):
         return Response(serializer.data)
 
 
+class SubmitPartnerView(APIView):
+    def post(self, request):
+        print(request.data)
+        serializer = PartnerSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=200)
+
+        print(serializer.errors)
+        return Response(serializer.errors, status=400)
+
+
 class SubmitSuggestionView(APIView):
     def post(self, request):
         token = request.data.get('jwt')

@@ -10,7 +10,7 @@ class Partner(models.Model):
     university = models.CharField(max_length=255)
     phone = models.CharField(max_length=20)
     email = models.EmailField()
-    document_url = models.URLField()
+    document_url = models.FileField(blank=True, null=True)
 
     def __str__(self):
         return self.name

@@ -21,4 +21,6 @@ urlpatterns = [
     path('user/update/<str:field>/', update_user, name='update_user'),
     path('document/update/<str:id>', EditDocumentStatusView.as_view(), name='edit-document-status'),
     path('submit-suggestion', SubmitSuggestionView.as_view(), name='submit-suggestion'),
+    path('request-for-partnership', SubmitPartnerView.as_view(), name='submit-suggestion'),
+
 ]
